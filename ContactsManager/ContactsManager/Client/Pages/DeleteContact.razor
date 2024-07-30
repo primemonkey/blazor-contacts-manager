@@ -1,0 +1,74 @@
+﻿@page "/deletecontact/{Id:int}"
+@using ContactManager.Shared.Models
+@using ContactManager.Client.Services
+@inject ContactService ContactService
+@inject NavigationManager NavigationManager
+
+<h3>Delete Contact</h3>
+
+@if (contact == null)
+{
+    <p>Loading...</p>
+}
+else if (errorMessage != null)
+{
+    <div class="alert alert-danger">
+        <strong>Error:</strong> @errorMessage
+    </div>
+}
+else
+{
+    <div class="container mt-4">
+        <div class="alert alert-warning">
+            <h4 class="alert-heading">Are you sure?</h4>
+            <p>You are about to delete the contact:</p>
+            <ul>
+                <li><strong>Name:</strong> @contact.FirstName @contact.LastName</li>
+                <li><strong>Email:</strong> @contact.Email</li>
+            </ul>
+            <hr />
+            <p class="mb-0">This action cannot be undone.</p>
+        </div>
+        <div class="mt-3">
+            <button class="btn btn-danger" @onclick="ConfirmDelete">Delete</button>
+            <a class="btn btn-secondary" href="/contacts">Cancel</a>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private Contact contact;
+    private string errorMessage;
+
+    // Load contact details on initialization
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            contact = await ContactService.GetContact(Id);
+            if (contact == null)
+            {
+                errorMessage = "Contact not found.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred while fetching contact details: {ex.Message}";
+        }
+    }
+
+    // Handle the deletion process
+    private async Task ConfirmDelete()
+    {
+        try
+        {
+            await ContactService.DeleteContact(Id);
+            NavigationManager.NavigateTo("/contacts");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred while deleting the contact: {ex.Message}";
+        }
+    }
+}

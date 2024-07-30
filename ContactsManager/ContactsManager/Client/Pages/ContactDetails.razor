@@ -1,0 +1,69 @@
+﻿@page "/contactdetails/{Id:int}"
+@using ContactManager.Shared.Models
+@using ContactManager.Client.Services
+@inject ContactService ContactService
+
+<h3>Contact Details</h3>
+
+@if (contact == null)
+{
+    <p>Loading...</p>
+}
+else if (errorMessage != null)
+{
+    <div class="alert alert-danger">
+        <strong>Error:</strong> @errorMessage
+    </div>
+}
+else
+{
+    <!-- Display contact details -->
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header">
+                <h4>@contact.FirstName @contact.LastName</h4>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-3">Email</dt>
+                    <dd class="col-sm-9">@contact.Email</dd>
+                    <dt class="col-sm-3">Phone</dt>
+                    <dd class="col-sm-9">@contact.Phone</dd>
+                    <dt class="col-sm-3">Category</dt>
+                    <dd class="col-sm-9">@contact.Category</dd>
+                    <dt class="col-sm-3">Subcategory</dt>
+                    <dd class="col-sm-9">@contact.Subcategory</dd>
+                    <dt class="col-sm-3">Date of Birth</dt>
+                    <dd class="col-sm-9">@contact.DateOfBirth.ToShortDateString()</dd>
+                </dl>
+            </div>
+            <div class="card-footer">
+                <a class="btn btn-primary" href="/editcontact/@contact.Id">Edit</a>
+                <a class="btn btn-secondary" href="/contacts">Back to List</a>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private Contact contact;
+    private string errorMessage;
+
+    // Load contact details on initialization
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            contact = await ContactService.GetContact(Id);
+            if (contact == null)
+            {
+                errorMessage = "Contact not found.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred while fetching contact details: {ex.Message}";
+        }
+    }
+}

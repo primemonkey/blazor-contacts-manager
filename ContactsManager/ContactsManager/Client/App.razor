@@ -1,0 +1,21 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.WebAssembly.Hosting
+@using ContactManager.Shared.Models
+@using ContactManager.Client.Services
+@inject NavigationManager NavigationManager
+
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(Program).Assembly">
+        <Found Context="routeData">
+            <!-- Route matching and component rendering -->
+            <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+            <!-- Fallback content if no route matches -->
+            <LayoutView Layout="@typeof(MainLayout)">
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>

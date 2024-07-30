@@ -1,0 +1,71 @@
+﻿@page "/editcontact/{Id:int}"
+@using ContactManager.Shared.Models
+@using ContactManager.Client.Services
+@using Microsoft.AspNetCore.Components.Forms
+@inject ContactService ContactService
+@inject NavigationManager NavigationManager
+
+<h3>Edit Contact</h3>
+
+<EditForm Model="contact" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <!-- Input fields for editing contact details -->
+    <div class="form-group">
+        <label for="firstName">First Name</label>
+        <InputText id="firstName" class="form-control" @bind-Value="contact.FirstName" />
+    </div>
+    <div class="form-group">
+        <label for="lastName">Last Name</label>
+        <InputText id="lastName" class="form-control" @bind-Value="contact.LastName" />
+    </div>
+    <div class="form-group">
+        <label for="email">Email</label>
+        <InputText id="email" class="form-control" @bind-Value="contact.Email" />
+    </div>
+    <div class="form-group">
+        <label for="password">Password</label>
+        <InputText id="password" class="form-control" @bind-Value="contact.Password" type="password" />
+    </div>
+    <div class="form-group">
+        <label for="category">Category</label>
+        <InputSelect id="category" TValue="ContactCategory" class="form-control" @bind-Value="contact.Category">
+            <option value="">Select Category</option>
+            <option value="@ContactCategory.Business">Business</option>
+            <option value="@ContactCategory.Personal">Personal</option>
+            <option value="@ContactCategory.Other">Other</option>
+        </InputSelect>
+    </div>
+    <div class="form-group">
+        <label for="subcategory">Subcategory</label>
+        <InputText id="subcategory" class="form-control" @bind-Value="contact.Subcategory" />
+    </div>
+    <div class="form-group">
+        <label for="phone">Phone</label>
+        <InputText id="phone" class="form-control" @bind-Value="contact.Phone" />
+    </div>
+    <div class="form-group">
+        <label for="dateOfBirth">Date of Birth</label>
+        <InputDate id="dateOfBirth" TValue="DateTime" class="form-control" @bind-Value="contact.DateOfBirth" />
+    </div>
+    <button type="submit" class="btn btn-primary">Update</button>
+</EditForm>
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private Contact contact;
+
+    // Load contact details on initialization
+    protected override async Task OnInitializedAsync()
+    {
+        contact = await ContactService.GetContact(Id);
+    }
+
+    // Handle form submission to update contact
+    private async Task HandleValidSubmit()
+    {
+        await ContactService.UpdateContact(contact);
+        NavigationManager.NavigateTo("/contacts");
+    }
+}
